@@ -12,7 +12,8 @@
     --red: #E0202B; --blue: #2356E6; --dem: #2356E6; --gop: #E0202B; --ind: #bdbdbd;
     --r: 4px;
   }
-  * { box-sizing: border-box; }
+  * { box-sizing: border-box; }SUPABASE_URL: "https://rddidsuodnqgbbfnawzs.supabase.co",          // e.g. "https://abcd1234.supabase.co"  (blank = solo/demo mode)
+  SUPABASE_ANON_KEY: "sb_publishable_FoS1KTpBm2R7D9e1csN_cg_62Rd0OvM",su
   html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'DM Sans', system-ui, sans-serif; }
   body { background-image: radial-gradient(circle at 1px 1px, #1a1a1a 1px, transparent 0); background-size: 22px 22px; min-height: 100vh; }
   h1,h2,h3 { font-family: 'Special Elite', 'Courier New', monospace; margin: 0; font-weight: 400; }
@@ -350,7 +351,7 @@ const LS = { get(k,d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } 
 const store = {
   async loadAll(){
     if (useSB) {
-      const [{data:picks},{data:results},{data:races}] = await Promise.all([ sb.from("picks").select("*"), sb.from("results").select("*"), sb.from("races").select("*").order("sort") ]);
+      const [{data:picks},{data:results},{data:races}] = await Promise.all([ sb.from("picks").select("*"), sb.from("results").select("*"), sb.from("en_races").select("*").order("sort") ]);
       return { picks:picks||[], results:Object.fromEntries((results||[]).map(r=>[r.race_id,{winner:r.winner,margin:r.margin}])), races:(races||[]).map(r=>({...r, opts: typeof r.opts==="string"?JSON.parse(r.opts):r.opts})) };
     }
     return { picks:LS.get("en_picks",[]), results:LS.get("en_results",{}), races:LS.get("en_races",[]) };
@@ -368,11 +369,11 @@ const store = {
     const r = LS.get("en_results",{}); if (winner) r[race_id]={winner, margin:margin ?? null}; else delete r[race_id]; LS.set("en_results",r);
   },
   async saveRaces(rows){
-    if (useSB) { const {error} = await sb.from("races").upsert(rows.map(r=>({id:r.id, sort:r.sort, grp:r.group, title:r.title, note:r.note||"", pts:r.pts||1, margin:!!r.margin, opts:r.opts, seats:r.seats||null}))); if (error) throw error; return; }
+    if (useSB) { const {error} = await sb.from("en_races").upsert(rows.map(r=>({id:r.id, sort:r.sort, grp:r.group, title:r.title, note:r.note||"", pts:r.pts||1, margin:!!r.margin, opts:r.opts, seats:r.seats||null}))); if (error) throw error; return; }
     const cur = LS.get("en_races",[]).filter(x => !rows.some(r=>r.id===x.id)); LS.set("en_races", cur.concat(rows));
   },
   async deleteRace(id){
-    if (useSB) { const {error} = await sb.from("races").delete().eq("id",id); if (error) throw error; return; }
+    if (useSB) { const {error} = await sb.from("en_races").delete().eq("id",id); if (error) throw error; return; }
     LS.set("en_races", LS.get("en_races",[]).filter(r=>r.id!==id));
   }
 };
