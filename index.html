@@ -209,7 +209,7 @@
       <div class="row"><span id="meAv" class="av"></span><div><b id="meName" style="font-size:18px"></b><div class="sub" id="meConf"></div></div></div>
       <div class="row"><span class="hype" id="pickProgress"></span><button class="btn ghost sm" id="editMeBtn">Edit me</button></div>
     </div>
-    <p class="sub" style="margin:0 0 6px">Pick as many or as few as you want. Skipped races are just 0. Margin races: call the spread for bonus points.</p>
+    <p class="sub" style="margin:0 0 6px">Pick as many or as few as you want. Skipped races are just 0. Call the spread too for bonus points.</p>
     <div id="raceList"></div>
   </section>
 
@@ -235,7 +235,7 @@
       <p class="sub">Whoever's on results duty enters the PIN once. Everyone else: watch, sweat.</p>
       <div class="row" style="margin-top:10px"><input type="password" id="pinInput" placeholder="PIN" style="max-width:160px"><button class="btn" id="pinBtn">Unlock</button></div>
     </div>
-    <div class="card"><h2 style="font-size:18px;margin-bottom:8px">Call the races</h2><p class="sub" style="margin:0 0 6px">Tap the winner. For margin races, type the final spread in points.</p><div id="resultsList"></div></div>
+    <div class="card"><h2 style="font-size:18px;margin-bottom:8px">Call the races</h2><p class="sub" style="margin:0 0 6px">Tap the winner, then type the final spread in points. For Senate/House control, type the winning party's seat total.</p><div id="resultsList"></div></div>
     <div class="card blue hidden" id="manageCard">
       <h2 style="font-size:18px">Manage races</h2>
       <p class="sub">Add a race the office cares about, or delete one. Changes show up for everyone within a few seconds.</p>
@@ -248,7 +248,7 @@
         <div><label class="lab">Candidate 2</label><input type="text" id="rC2" placeholder="Name"></div>
         <div><label class="lab">Party</label><select id="rP2"><option value="R">Republican</option><option value="D">Democrat</option><option value="I">Independent</option></select></div>
         <div class="full"><label class="lab">Note (optional)</label><input type="text" id="rNote" placeholder="e.g. First bellwether of the night"></div>
-        <div class="full check"><input type="checkbox" id="rMargin"> <label for="rMargin">Ask for margin too (<span id="mgBonusTxt"></span>)</label></div>
+        <div class="full check"><input type="checkbox" id="rMargin" checked> <label for="rMargin">Ask for margin too (<span id="mgBonusTxt"></span>)</label></div>
         <div class="full"><button class="btn red" id="addRaceBtn">Add race</button></div>
       </div>
     </div>
@@ -279,16 +279,18 @@ const CONFIG = {
 
 /* ============================================================
    DEFAULT SLATE — used until an admin edits races in-app.
+   Every race asks for a margin. seats:N switches a race to "final seat count" mode.
+   Every race asks for a margin except "Big picture" ones.
    ============================================================ */
 const DEFAULT_RACES = [
-  { id:"sen-tx", group:"Senate", title:"Texas Senate", margin:true, opts:[{n:"James Talarico",p:"D"},{n:"Ken Paxton",p:"R"}] },
-  { id:"sen-mi", group:"Senate", title:"Michigan Senate", margin:true, opts:[{n:"Abdul El-Sayed",p:"D"},{n:"Mike Rogers",p:"R"}] },
+  { id:"sen-tx", group:"Senate", title:"Texas Senate", opts:[{n:"James Talarico",p:"D"},{n:"Ken Paxton",p:"R"}] },
+  { id:"sen-mi", group:"Senate", title:"Michigan Senate", opts:[{n:"Abdul El-Sayed",p:"D"},{n:"Mike Rogers",p:"R"}] },
   { id:"sen-nc", group:"Senate", title:"North Carolina Senate", opts:[{n:"Roy Cooper",p:"D"},{n:"Michael Whatley",p:"R"}] },
   { id:"sen-ga", group:"Senate", title:"Georgia Senate", opts:[{n:"Jon Ossoff",p:"D"},{n:"Mike Collins",p:"R"}] },
   { id:"sen-oh", group:"Senate", title:"Ohio Senate", opts:[{n:"Sherrod Brown",p:"D"},{n:"Jon Husted",p:"R"}] },
   { id:"sen-me", group:"Senate", title:"Maine Senate", opts:[{n:"Troy Jackson",p:"D"},{n:"Susan Collins",p:"R"}] },
   { id:"sen-nh", group:"Senate", title:"New Hampshire Senate", opts:[{n:"Chris Pappas",p:"D"},{n:"John Sununu",p:"R"}] },
-  { id:"sen-ia", group:"Senate", title:"Iowa Senate", margin:true, opts:[{n:"Josh Turek",p:"D"},{n:"Ashley Hinson",p:"R"}] },
+  { id:"sen-ia", group:"Senate", title:"Iowa Senate", opts:[{n:"Josh Turek",p:"D"},{n:"Ashley Hinson",p:"R"}] },
   { id:"sen-sc", group:"Senate", title:"South Carolina Senate", opts:[{n:"Annie Andrews",p:"D"},{n:"Darline Graham",p:"R"}] },
   { id:"gov-tx", group:"Governor", title:"Texas Governor", opts:[{n:"Gina Hinojosa",p:"D"},{n:"Greg Abbott",p:"R"}] },
   { id:"gov-ga", group:"Governor", title:"Georgia Governor", opts:[{n:"Keisha Lance Bottoms",p:"D"},{n:"Rick Jackson",p:"R"}] },
@@ -301,9 +303,9 @@ const DEFAULT_RACES = [
   { id:"hse-nc11", group:"House", title:"NC-11 (Asheville)", opts:[{n:"Jamie Ager",p:"D"},{n:"Jennifer Balkcom",p:"R"}] },
   { id:"hse-ca22", group:"House", title:"CA-22 (Central Valley)", opts:[{n:"Randy Villegas",p:"D"},{n:"David Valadao",p:"R"}] },
   { id:"hse-fl22", group:"House", title:"FL-22 (open seat)", opts:[{n:"Pia Dandiya",p:"D"},{n:"Casey Askar",p:"R"}] },
-  { id:"ctl-sen", group:"Big picture", title:"Who controls the Senate?", pts:2, opts:[{n:"Democrats",p:"D"},{n:"Republicans",p:"R"}] },
-  { id:"ctl-hse", group:"Big picture", title:"Who controls the House?", pts:2, opts:[{n:"Democrats",p:"D"},{n:"Republicans",p:"R"}] },
-].map((r,i) => ({ sort:i, pts:1, margin:false, note:"", ...r }));
+  { id:"ctl-sen", group:"Big picture", title:"Who controls the Senate?", pts:2, seats:100, opts:[{n:"Democrats",p:"D"},{n:"Republicans",p:"R"}] },
+  { id:"ctl-hse", group:"Big picture", title:"Who controls the House?", pts:2, seats:435, opts:[{n:"Democrats",p:"D"},{n:"Republicans",p:"R"}] },
+].map((r,i) => ({ sort:i, pts:1, margin:true, note:"", ...r }));
 const GROUP_ORDER = ["Senate","Governor","House","Big picture","Other"];
 const COLORS = ["W","R","B","K"];
 const HYPE = ["No cowards.","Lock it in.","Bold calls only.","Trust your gut.","The office is watching.","Big night energy.","Pick with your chest.","Respect the spread.","Make the ad, then make the call."];
@@ -365,7 +367,7 @@ const store = {
     const r = LS.get("en_results",{}); if (winner) r[race_id]={winner, margin:margin ?? null}; else delete r[race_id]; LS.set("en_results",r);
   },
   async saveRaces(rows){
-    if (useSB) { const {error} = await sb.from("races").upsert(rows.map(r=>({id:r.id, sort:r.sort, grp:r.group, title:r.title, note:r.note||"", pts:r.pts||1, margin:!!r.margin, opts:r.opts}))); if (error) throw error; return; }
+    if (useSB) { const {error} = await sb.from("races").upsert(rows.map(r=>({id:r.id, sort:r.sort, grp:r.group, title:r.title, note:r.note||"", pts:r.pts||1, margin:!!r.margin, opts:r.opts, seats:r.seats||null}))); if (error) throw error; return; }
     const cur = LS.get("en_races",[]).filter(x => !rows.some(r=>r.id===x.id)); LS.set("en_races", cur.concat(rows));
   },
   async deleteRace(id){
@@ -455,12 +457,12 @@ function renderHeader(){
   $("#syncPill").className = "pill " + (useSB ? "live" : "");
   $("#syncTxt").textContent = useSB ? "live" : "solo mode";
   $("#mgBonusTxt").textContent = `+${CONFIG.MARGIN_EXACT} exact, +${CONFIG.MARGIN_CLOSE} within ${CONFIG.MARGIN_WINDOW}`;
-  $("#rulesTxt").innerHTML = `1 pt per correct call (2 for chamber control). On <b>margin</b> races you also call the spread in points: nail it exactly for +${CONFIG.MARGIN_EXACT}, land within ${CONFIG.MARGIN_WINDOW} for +${CONFIG.MARGIN_CLOSE} — only if you also got the winner. <b>Pick as many as you want; more picks + more right = higher.</b> Skipped races are just 0. Races you work on are locked out (fan picks don't score). Ties break on accuracy.<br><br>Badges — <b>Oracle</b>: #1 · <b>Contrarian</b>: right when under 35% of the office agreed · <b>Sniper</b>: 2+ margins hit · <b>Ice cold</b>: last place, sorry.`;
+  $("#rulesTxt").innerHTML = `1 pt per correct call (2 for chamber control). Every race also asks for the spread in points (for Senate and House control, the winner's final seat count): nail it exactly for +${CONFIG.MARGIN_EXACT}, land within ${CONFIG.MARGIN_WINDOW} for +${CONFIG.MARGIN_CLOSE} — only if you also got the winner. <b>Pick as many as you want; more picks + more right = higher.</b> Skipped races are just 0. Races you work on are locked out (fan picks don't score). Ties break on accuracy.<br><br>Badges — <b>Oracle</b>: #1 · <b>Contrarian</b>: right when under 35% of the office agreed · <b>Sniper</b>: 2+ margins hit · <b>Ice cold</b>: last place, sorry.`;
 }
 function renderTicker(){
   const { results } = state.all; const rb = RACE_BY_ID();
   const items = [];
-  for (const [id,res] of Object.entries(results)) if (rb[id]) items.push(`CALLED — ${rb[id].title.toUpperCase()}: ${res.winner.toUpperCase()}${res.margin!==null&&res.margin!==undefined&&res.margin!==""?` BY ${res.margin}`:""}`);
+  for (const [id,res] of Object.entries(results)) if (rb[id]) items.push(`CALLED — ${rb[id].title.toUpperCase()}: ${res.winner.toUpperCase()}${hasVal(res.margin)?(rb[id].seats?` ${split(rb[id],res.margin)}`:` BY ${res.margin}`):""}`);
   const n = new Set(state.all.picks.filter(p=>p.pick).map(p=>p.name)).size;
   items.push(n ? `${n} ${n===1?"PERSON HAS":"PEOPLE HAVE"} MADE PICKS` : "NOBODY HAS PICKED YET. BE BRAVE.");
   items.push(HYPE[Math.floor(Date.now()/60000)%HYPE.length].toUpperCase());
@@ -474,9 +476,9 @@ function renderOnboard(){
   $("#conflictChips").innerHTML = RACES.filter(r=>r.group!=="Big picture").map(r => `<button class="chip ${me.conflicts.includes(r.id)?'sel':''}" data-r="${r.id}">${esc(short(r.title))}</button>`).join("");
   $$("#conflictChips .chip").forEach(c => c.onclick = () => c.classList.toggle("sel"));
 }
-function stepper(raceId, val, disabled, cls=""){
+function stepper(raceId, val, disabled, cls="", max=99){
   const set = val!==null && val!==undefined && val!=="";
-  return `<span class="stepper ${set?'set':''} ${cls}"><button data-step="-1" data-r="${raceId}" ${disabled?'disabled':''}>−</button><input type="number" min="0" max="99" inputmode="numeric" placeholder="—" value="${set?esc(val):''}" data-mg="${raceId}" ${disabled?'disabled':''}><button data-step="1" data-r="${raceId}" ${disabled?'disabled':''}>+</button></span>`;
+  return `<span class="stepper ${set?'set':''} ${cls}"><button data-step="-1" data-r="${raceId}" ${disabled?'disabled':''}>−</button><input type="number" min="0" max="${max}" data-max="${max}" inputmode="numeric" placeholder="—" value="${set?esc(val):''}" data-mg="${raceId}" ${disabled?'disabled':''}><button data-step="1" data-r="${raceId}" ${disabled?'disabled':''}>+</button></span>`;
 }
 function renderPicks(){
   const me = state.me; if (!me) return;
@@ -498,9 +500,11 @@ function renderPicks(){
       html += `<div class="race ${conf?'conflict':''} ${res?'called':''}">
         ${res?`<div class="stamp">Called</div>`:""}
         <div class="race-head"><div><h3>${esc(r.title)}</h3>${r.note?`<div class="meta">${esc(r.note)}</div>`:""}</div>
-          <div class="tags">${conf?'<span class="tag conf">Your race · fan pick only</span>':''}${ptsOf(r)>1?`<span class="tag pts">${ptsOf(r)} pts</span>`:''}${r.margin?`<span class="tag mg">Margin bonus</span>`:''}</div></div>
+          <div class="tags">${conf?'<span class="tag conf">Your race · fan pick only</span>':''}${ptsOf(r)>1?`<span class="tag pts">${ptsOf(r)} pts</span>`:''}${r.margin?`<span class="tag mg">${r.seats?"Seat count bonus":"Margin bonus"}</span>`:''}</div></div>
         <div class="opts">${r.opts.map(o => `<button class="opt ${o.p} ${conf?'heart':''} ${my===o.n?'sel':''} ${res?(res.winner===o.n?'winner':'loser'):''}" data-r="${r.id}" data-p="${esc(o.n)}" ${disabled?'disabled':''}><span class="nm">${esc(o.n)}</span><span class="pt">${o.p==="D"?"Democrat":o.p==="R"?"Republican":"Independent"}</span></button>`).join("")}</div>
-        ${r.margin ? `<div class="margin"><span class="lbl">${my?`${esc(my.split(" ").pop())} wins by`:"Margin"} <span>${my?"pts":"— pick a winner first"}</span></span>${stepper(r.id, myM, disabled||!my)}${res&&res.margin!==null&&res.margin!==undefined&&res.margin!==""?`<span class="res">Actual: ${esc(res.margin)}${myM!==undefined&&myM!==null&&myM!==""&&my===res.winner?` · ${marginBonus(myM,res.margin)?`+${marginBonus(myM,res.margin)} bonus`:"no bonus"}`:""}</span>`:""}</div>` : ""}
+        ${r.margin ? (r.seats
+          ? `<div class="margin"><span class="lbl">Final count <span>— ${esc((my||"Dems").split(" ").pop())} seats${hasVal(myM)?` → ${split(r,myM)}`:""}</span></span>${stepper(r.id, myM, disabled||!my, "", r.seats)}${res&&hasVal(res.margin)?`<span class="res">Actual: ${esc(split(r,res.margin))}${hasVal(myM)&&my===res.winner?` · ${marginBonus(myM,res.margin)?`+${marginBonus(myM,res.margin)} bonus`:"no bonus"}`:""}</span>`:""}</div>`
+          : `<div class="margin"><span class="lbl">${my?`${esc(my.split(" ").pop())} wins by`:"Margin"} <span>${my?"pts":"— pick a winner first"}</span></span>${stepper(r.id, myM, disabled||!my)}${res&&hasVal(res.margin)?`<span class="res">Actual: ${esc(res.margin)}${hasVal(myM)&&my===res.winner?` · ${marginBonus(myM,res.margin)?`+${marginBonus(myM,res.margin)} bonus`:"no bonus"}`:""}</span>`:""}</div>`) : ""}
         ${cs.total ? `<div class="consensus">${r.opts.map(o=>`<div style="width:${100*(cs.counts[o.n]||0)/cs.total}%;background:${pc(o.p)}"></div>`).join("")}</div>
         <div class="consensus-lbl"><span>Office says: ${r.opts.map(o=>`${esc(o.n.split(" ").pop())} ${Math.round(100*(cs.counts[o.n]||0)/cs.total)}%`).join(" · ")}</span><span>${cs.total} ${cs.total===1?'pick':'picks'}</span></div>` : `<div class="consensus-lbl"><span>No office picks yet — be first</span></div>`}
       </div>`;
@@ -511,10 +515,12 @@ function renderPicks(){
   wireSteppers("#raceList", (id, v) => makeMargin(id, v));
 }
 function wireSteppers(scope, onChange){
-  $$(`${scope} input[data-mg]`).forEach(i => i.onchange = () => onChange(i.dataset.mg, clampMg(i.value)));
-  $$(`${scope} button[data-step]`).forEach(b => b.onclick = () => { const i = $(`${scope} input[data-mg="${b.dataset.r}"]`); const cur = i.value===""?0:Number(i.value); onChange(b.dataset.r, clampMg(cur + Number(b.dataset.step))); });
+  $$(`${scope} input[data-mg]`).forEach(i => i.onchange = () => onChange(i.dataset.mg, clampMg(i.value, Number(i.dataset.max))));
+  $$(`${scope} button[data-step]`).forEach(b => b.onclick = () => { const i = $(`${scope} input[data-mg="${b.dataset.r}"]`); const max = Number(i.dataset.max); const cur = i.value===""?(max>99?Math.floor(max/2):0):Number(i.value); onChange(b.dataset.r, clampMg(cur + Number(b.dataset.step), max)); });
 }
-const clampMg = v => { if (v==="" || v===null) return null; const n = Math.round(Number(v)); if (isNaN(n)) return null; return String(Math.max(0, Math.min(99, n))); };
+const clampMg = (v, max=99) => { if (v==="" || v===null) return null; const n = Math.round(Number(v)); if (isNaN(n)) return null; return String(Math.max(0, Math.min(max, n))); };
+const hasVal = v => v!==null && v!==undefined && v!=="";
+const split = (r, v) => hasVal(v) ? `${v}–${r.seats - Number(v)}` : "";
 function renderBoard(){
   const { rows, upsets, anyCalled } = computeBoard();
   $("#stPlayers").textContent = rows.length; $("#stCalled").textContent = Object.keys(state.all.results).length; $("#stUpsets").textContent = upsets;
@@ -542,10 +548,10 @@ function renderResults(){
     const res = results[r.id]; const cs = consensus[r.id];
     const fav = cs.total ? Object.entries(cs.counts).sort((a,b)=>b[1]-a[1])[0] : null;
     const hasM = res && res.margin!==null && res.margin!==undefined && res.margin!=="";
-    return `<div class="res-row"><div><div class="nm">${esc(r.title)} ${res?`<span class="tag ok">${esc(res.winner)}${hasM?` by ${esc(res.margin)}`:""}</span>`:""}</div>
-      <div class="who">${fav?`Office favorite: ${esc(fav[0])} (${Math.round(100*fav[1]/cs.total)}%)`:"No picks yet"}${r.margin?" · margin race":""}</div></div>
+    return `<div class="res-row"><div><div class="nm">${esc(r.title)} ${res?`<span class="tag ok">${esc(res.winner)}${hasM?(r.seats?` ${esc(split(r,res.margin))}`:` by ${esc(res.margin)}`):""}</span>`:""}</div>
+      <div class="who">${fav?`Office favorite: ${esc(fav[0])} (${Math.round(100*fav[1]/cs.total)}%)`:"No picks yet"}${r.seats?" · enter the winner's seat total":""}</div></div>
       ${state.admin ? `<div class="res-btns">${r.opts.map(o=>`<button class="${o.p} ${res?.winner===o.n?'on':''}" data-r="${r.id}" data-w="${esc(o.n)}">${esc(o.n)}</button>`).join("")}
-        ${r.margin && res ? `<span class="sub">by</span>${stepper(r.id, res.margin, false)}` : ""}
+        ${r.margin && res ? `<span class="sub">${r.seats?"seats for winner":"by"}</span>${stepper(r.id, res.margin, false, "", r.seats||99)}` : ""}
         ${res?`<button data-r="${r.id}" data-w="">Undo</button>`:""}<button class="del" data-del="${r.id}">DELETE</button></div>` : ""}
     </div>`;
   }).join("");
@@ -610,7 +616,7 @@ async function addRace(){
   const r = { id, sort: Math.max(0,...RACES.map(x=>x.sort||0))+1, group:$("#rGroup").value, title, note:$("#rNote").value.trim(), pts:Math.max(1,+$("#rPts").value||1), margin:$("#rMargin").checked, opts:[{n:c1,p:$("#rP1").value},{n:c2,p:$("#rP2").value}] };
   RACES.push(r);
   try { await ensureSeeded(); await store.saveRaces([r]); } catch(e){ console.error(e); return toast("Couldn't save race — is the races table set up?"); }
-  ["#rTitle","#rC1","#rC2","#rNote"].forEach(s=>$(s).value=""); $("#rMargin").checked=false; $("#rPts").value=1;
+  ["#rTitle","#rC1","#rC2","#rNote"].forEach(s=>$(s).value=""); $("#rMargin").checked=true; $("#rPts").value=1;
   renderAll(); toast(`Added: ${title}`);
 }
 async function deleteRace(id){
