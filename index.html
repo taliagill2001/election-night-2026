@@ -248,6 +248,7 @@
         <div><label class="lab">Candidate 2</label><input type="text" id="rC2" placeholder="Name"></div>
         <div><label class="lab">Party</label><select id="rP2"><option value="R">Republican</option><option value="D">Democrat</option><option value="I">Independent</option></select></div>
         <div class="full"><label class="lab">Note (optional)</label><input type="text" id="rNote" placeholder="e.g. First bellwether of the night"></div>
+        <div class="full"><label class="lab">Position</label><select id="rPos"></select></div>
         <div class="full check"><input type="checkbox" id="rMargin" checked> <label for="rMargin">Ask for margin too (<span id="mgBonusTxt"></span>)</label></div>
         <div class="full"><button class="btn red" id="addRaceBtn">Add race</button></div>
       </div>
@@ -540,7 +541,14 @@ function renderBoard(){
     </div>`;
   }).join("");
 }
+function renderPosOptions(){
+  const g = $("#rGroup").value; const inGroup = RACES.filter(r=>r.group===g);
+  const keep = $("#rPos").value;
+  $("#rPos").innerHTML = `<option value="top">Top of ${esc(g)}</option>` + inGroup.map(r=>`<option value="after:${r.id}">After ${esc(r.title)}</option>`).join("") + `<option value="bottom">Bottom of ${esc(g)}</option>`;
+  if ([...$("#rPos").options].some(o=>o.value===keep)) $("#rPos").value = keep;
+}
 function renderResults(){
+  renderPosOptions();
   $("#adminGate").classList.toggle("hidden", state.admin);
   $("#manageCard").classList.toggle("hidden", !state.admin);
   const results = state.all.results; const { consensus } = computeBoard();
@@ -552,12 +560,13 @@ function renderResults(){
       <div class="who">${fav?`Office favorite: ${esc(fav[0])} (${Math.round(100*fav[1]/cs.total)}%)`:"No picks yet"}${r.seats?" · enter the winner's seat total":""}</div></div>
       ${state.admin ? `<div class="res-btns">${r.opts.map(o=>`<button class="${o.p} ${res?.winner===o.n?'on':''}" data-r="${r.id}" data-w="${esc(o.n)}">${esc(o.n)}</button>`).join("")}
         ${r.margin && res ? `<span class="sub">${r.seats?"seats for winner":"by"}</span>${stepper(r.id, res.margin, false, "", r.seats||99)}` : ""}
-        ${res?`<button data-r="${r.id}" data-w="">Undo</button>`:""}<button class="del" data-del="${r.id}">DELETE</button></div>` : ""}
+        ${res?`<button data-r="${r.id}" data-w="">Undo</button>`:""}<button data-move="-1" data-id="${r.id}" title="Move up">&#9650;</button><button data-move="1" data-id="${r.id}" title="Move down">&#9660;</button><button class="del" data-del="${r.id}">DELETE</button></div>` : ""}
     </div>`;
   }).join("");
   $$("#resultsList button[data-w]").forEach(b => b.onclick = () => callRace(b.dataset.r, b.dataset.w));
   wireSteppers("#resultsList", (id, v) => callRace(id, results[id].winner, v));
   $$("#resultsList button[data-del]").forEach(b => b.onclick = () => deleteRace(b.dataset.del));
+  $$("#resultsList button[data-move]").forEach(b => b.onclick = () => moveRace(b.dataset.id, Number(b.dataset.move)));
 }
 function renderAll(){ renderHeader(); renderTicker(); if (state.me) { renderPicks(); renderBoard(); renderResults(); } }
 
@@ -613,17 +622,33 @@ async function addRace(){
   const title = $("#rTitle").value.trim(), c1 = $("#rC1").value.trim(), c2 = $("#rC2").value.trim();
   if (!title || !c1 || !c2) return toast("Need a title and two candidates.");
   const id = "x-" + title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") + "-" + Date.now().toString(36).slice(-4);
-  const r = { id, sort: Math.max(0,...RACES.map(x=>x.sort||0))+1, group:$("#rGroup").value, title, note:$("#rNote").value.trim(), pts:Math.max(1,+$("#rPts").value||1), margin:$("#rMargin").checked, opts:[{n:c1,p:$("#rP1").value},{n:c2,p:$("#rP2").value}] };
-  RACES.push(r);
-  try { await ensureSeeded(); await store.saveRaces([r]); } catch(e){ console.error(e); return toast("Couldn't save race — is the races table set up?"); }
+  const group = $("#rGroup").value;
+  const r = { id, sort:0, group, title, note:$("#rNote").value.trim(), pts:Math.max(1,+$("#rPts").value||1), margin:$("#rMargin").checked, opts:[{n:c1,p:$("#rP1").value},{n:c2,p:$("#rP2").value}] };
+  const pos = $("#rPos").value; const inGroup = RACES.filter(x=>x.group===group);
+  let at;
+  if (pos==="top") at = inGroup.length ? RACES.indexOf(inGroup[0]) : RACES.length;
+  else if (pos.startsWith("after:")) { const i = RACES.findIndex(x=>x.id===pos.slice(6)); at = i<0 ? RACES.length : i+1; }
+  else at = inGroup.length ? RACES.indexOf(inGroup[inGroup.length-1])+1 : RACES.length;
+  RACES.splice(at, 0, r);
+  RACES.forEach((x,i)=>x.sort=i);
+  try { await store.saveRaces(RACES); racesSeeded = true; } catch(e){ console.error(e); RACES = RACES.filter(x=>x.id!==id); return toast(`Couldn't save race: ${e.message||e.code||"check the races table"}`); }
   ["#rTitle","#rC1","#rC2","#rNote"].forEach(s=>$(s).value=""); $("#rMargin").checked=true; $("#rPts").value=1;
   renderAll(); toast(`Added: ${title}`);
+}
+async function moveRace(id, dir){
+  const i = RACES.findIndex(x=>x.id===id); const j = i + dir;
+  if (i<0 || j<0 || j>=RACES.length) return;
+  if (RACES[j].group !== RACES[i].group) return toast("That's the edge of the group.");
+  [RACES[i], RACES[j]] = [RACES[j], RACES[i]];
+  RACES.forEach((x,k)=>x.sort=k);
+  renderAll();
+  try { await store.saveRaces(RACES); racesSeeded = true; } catch(e){ console.error(e); toast(`Couldn't save order: ${e.message||e.code}`); }
 }
 async function deleteRace(id){
   const r = RACE_BY_ID()[id]; if (!r) return;
   if (!confirm(`Delete "${r.title}"? Everyone's picks on it stop counting.`)) return;
   RACES = RACES.filter(x=>x.id!==id);
-  try { await ensureSeeded(); await store.deleteRace(id); } catch(e){ console.error(e); return toast("Couldn't delete"); }
+  try { await ensureSeeded(); await store.deleteRace(id); } catch(e){ console.error(e); return toast(`Couldn't delete: ${e.message||e.code}`); }
   renderAll(); toast(`Deleted ${r.title}`);
 }
 function showView(v){
@@ -663,6 +688,7 @@ $("#editMeBtn").onclick = () => { renderOnboard(); showView("onboard"); $("nav.t
 $("#pinBtn").onclick = () => { if ($("#pinInput").value === CONFIG.ADMIN_PIN) { state.admin=true; sessionStorage.setItem("en_admin","1"); renderResults(); toast("You're on results duty. No pressure."); } else toast("Nope."); };
 $("#pinInput").addEventListener("keydown", e => { if (e.key==="Enter") $("#pinBtn").click(); });
 $("#addRaceBtn").onclick = addRace;
+$("#rGroup").onchange = renderPosOptions;
 $$("nav.tabs button").forEach(b => b.onclick = () => showView(b.dataset.view));
 
 renderOnboard();
