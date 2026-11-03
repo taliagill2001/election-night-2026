@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FIGHT. Election Night Picks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Archivo+Black&family=DM+Sans:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #000; --ink: #fff; --card: #111; --line: #2a2a2a; --muted: #9a9a9a; --soft: #d8d8d8;
+    --red: #E0202B; --blue: #2356E6; --dem: #2356E6; --gop: #E0202B; --ind: #bdbdbd;
+    --r: 4px;
+  }
+  * { box-sizing: border-box; }SUPABASE_URL: "https://rddidsuodnqgbbfnawzs.supabase.co",          // e.g. "https://abcd1234.supabase.co"  (blank = solo/demo mode)
+  SUPABASE_ANON_KEY: "sb_publishable_FoS1KTpBm2R7D9e1csN_cg_62Rd0OvM",su
+  html, body { margin: 0; background: var(--bg); color: var(--ink); font-family: 'DM Sans', system-ui, sans-serif; }
+  body { background-image: radial-gradient(circle at 1px 1px, #1a1a1a 1px, transparent 0); background-size: 22px 22px; min-height: 100vh; }
+  h1,h2,h3 { font-family: 'Special Elite', 'Courier New', monospace; margin: 0; font-weight: 400; }
+  button { font-family: inherit; cursor: pointer; }
+  .wrap { max-width: 940px; margin: 0 auto; padding: 14px 14px 100px; }
+  .mono { font-family: 'Special Elite', monospace; text-transform: uppercase; letter-spacing: .08em; }
+
+  .ticker { background: var(--ink); color: #000; font-family: 'Special Elite', monospace; font-size: 14px; overflow: hidden; white-space: nowrap; border-bottom: 3px solid var(--red); }
+  .ticker span { display: inline-block; padding-left: 100%; animation: tick 30s linear infinite; }
+  @keyframes tick { to { transform: translateX(-100%); } }
+
+  header { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 14px 0 18px; flex-wrap: wrap; }
+  .logo { display: flex; align-items: baseline; gap: 12px; }
+  .logo img { height: 34px; display: block; }
+  .logo .sub { font-family: 'Special Elite', monospace; font-size: 15px; color: var(--red); letter-spacing: .08em; text-transform: uppercase; }
+  .pills { display: flex; gap: 8px; flex-wrap: wrap; }
+  .pill { border: 2px solid var(--ink); border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em; display: inline-flex; align-items: center; gap: 7px; background: #000; }
+  .pill.live { border-color: var(--blue); color: var(--blue); }
+  .pill.locked { border-color: var(--red); color: var(--red); }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; animation: blink 1.2s infinite; }
+  @keyframes blink { 50% { opacity: .2; } }
+
+  nav.tabs { position: fixed; bottom: 0; left: 0; right: 0; background: #000; border-top: 3px solid var(--ink); display: flex; justify-content: center; z-index: 50; }
+  nav.tabs button { flex: 1; max-width: 220px; background: #000; border: 0; border-right: 1px solid var(--line); color: var(--muted); padding: 14px 6px; font-family: 'Special Elite', monospace; font-size: 14px; text-transform: uppercase; letter-spacing: .1em; }
+  nav.tabs button:last-child { border-right: 0; }
+  nav.tabs button.active { background: var(--ink); color: #000; }
+  .view { display: none; } .view.active { display: block; animation: pop .25s ease; }
+  @keyframes pop { from { opacity: 0; transform: translateY(8px);} to { opacity: 1; transform: none;} }
+
+  .card { background: var(--card); border: 2px solid var(--ink); border-radius: var(--r); padding: 18px; margin-bottom: 14px; box-shadow: 6px 6px 0 var(--red); }
+  .card.blue { box-shadow: 6px 6px 0 var(--blue); }
+  .card.plain { box-shadow: none; border-color: var(--line); }
+  .card h2 { font-size: 24px; margin-bottom: 6px; }
+  .sub { color: var(--muted); font-size: 14px; line-height: 1.5; }
+  .sub b { color: var(--ink); }
+  .section-title { display: flex; align-items: center; justify-content: space-between; margin: 26px 0 12px; border-bottom: 2px dashed var(--line); padding-bottom: 6px; }
+  .section-title h2 { font-size: 26px; }
+  .section-title .count { color: var(--red); font-family: 'Special Elite', monospace; font-size: 13px; text-transform: uppercase; }
+
+  /* avatar = initials tile */
+  .av { display: inline-flex; align-items: center; justify-content: center; font-family: 'Archivo Black'; border-radius: var(--r); width: 40px; height: 40px; font-size: 15px; letter-spacing: .02em; flex-shrink: 0; }
+  .av.W { background: var(--ink); color: #000; } .av.R { background: var(--red); color: #fff; } .av.B { background: var(--blue); color: #fff; } .av.K { background: #000; color: #fff; border: 2px solid var(--ink); }
+  .colors { display: flex; gap: 8px; margin: 12px 0; }
+  .colors button { width: 48px; height: 48px; border-radius: var(--r); border: 3px solid transparent; }
+  .colors button.W { background: var(--ink); } .colors button.R { background: var(--red); } .colors button.B { background: var(--blue); } .colors button.K { background: #000; border-color: var(--line); }
+  .colors button.sel { outline: 3px solid var(--ink); outline-offset: 3px; }
+  input[type=text], input[type=password], input[type=number], select { width: 100%; background: #000; border: 2px solid var(--line); color: var(--ink); border-radius: var(--r); padding: 11px 13px; font-size: 16px; font-family: inherit; outline: none; }
+  input:focus, select:focus { border-color: var(--ink); }
+  .btn { background: var(--ink); color: #000; border: 2px solid var(--ink); border-radius: var(--r); padding: 11px 18px; font-weight: 900; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; transition: transform .1s, box-shadow .1s; box-shadow: 4px 4px 0 var(--red); }
+  .btn:hover { transform: translate(-1px,-1px); box-shadow: 5px 5px 0 var(--red); }
+  .btn:active { transform: translate(2px,2px); box-shadow: 1px 1px 0 var(--red); }
+  .btn.ghost { background: #000; color: var(--ink); box-shadow: none; }
+  .btn.red { background: var(--red); border-color: var(--red); color: #fff; box-shadow: 4px 4px 0 var(--ink); }
+  .btn.sm { padding: 7px 11px; font-size: 12px; }
+  .btn:disabled { opacity: .4; cursor: not-allowed; }
+  .row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  .chip { background: #000; border: 2px solid var(--line); color: var(--ink); border-radius: 999px; padding: 7px 13px; font-size: 13px; font-weight: 700; transition: transform .1s; }
+  .chip:hover { transform: rotate(-2deg); }
+  .chip.sel { border-color: var(--red); background: var(--red); color: #fff; }
+  .chip.sel::before { content: "LOCKED · "; font-size: 10px; letter-spacing: .08em; }
+
+  .race { background: var(--card); border: 2px solid var(--ink); border-radius: var(--r); padding: 14px; margin-bottom: 14px; position: relative; overflow: hidden; }
+  .race.conflict { border-style: dashed; border-color: var(--red); }
+  .race.called { border-color: var(--soft); background: #0a0a0a; }
+  .race-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; margin-bottom: 10px; flex-wrap: wrap; }
+  .race-head h3 { font-size: 20px; }
+  .race-head .meta { font-size: 12px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; margin-top: 2px; }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag { font-size: 11px; font-weight: 900; padding: 4px 9px; border-radius: 999px; background: #000; color: var(--muted); border: 2px solid var(--line); text-transform: uppercase; letter-spacing: .05em; }
+  .tag.conf { color: #fff; background: var(--red); border-color: var(--red); }
+  .tag.pts { color: var(--ink); border-color: var(--ink); }
+  .tag.mg { color: var(--blue); border-color: var(--blue); }
+  .tag.ok { color: var(--ink); border-color: var(--ink); background: var(--blue); }
+  .race.called .race-head { padding-right: 120px; }
+  .stamp { position: absolute; right: 12px; top: 12px; font-family: 'Special Elite', monospace; font-size: 20px; color: var(--red); border: 3px solid var(--red); padding: 2px 10px; border-radius: 4px; transform: rotate(-12deg); text-transform: uppercase; letter-spacing: .1em; animation: stamp .35s cubic-bezier(.2,2,.4,1); pointer-events: none; }
+  @keyframes stamp { from { transform: rotate(-12deg) scale(2.5); opacity: 0; } to { transform: rotate(-12deg) scale(1); opacity: 1; } }
+  .opts { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+  .opt { background: #000; border: 2px solid var(--line); color: var(--ink); border-radius: var(--r); padding: 12px 10px; text-align: left; display: flex; flex-direction: column; gap: 3px; transition: transform .12s, border-color .15s; position: relative; }
+  .opt:hover:not(:disabled) { transform: rotate(-1.5deg) scale(1.02); border-color: var(--ink); }
+  .opt .nm { font-weight: 900; font-size: 15px; }
+  .opt .pt { font-size: 11px; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: .06em; }
+  .opt.D { --c: var(--dem); --t: #fff; } .opt.R { --c: var(--gop); --t: #fff; } .opt.I { --c: var(--ind); --t: #000; }
+  .opt.sel { border-color: var(--c); background: var(--c); color: var(--t); animation: wiggle .3s; }
+  .opt.sel .pt { color: var(--t); opacity: .75; }
+  .opt.sel::after { content: "PICK"; position: absolute; top: 8px; right: 10px; font-size: 10px; font-weight: 900; letter-spacing: .1em; }
+  .opt.heart.sel::after { content: "FAN PICK"; }
+  .opt.winner { border-color: var(--ink); box-shadow: 0 0 0 3px var(--ink) inset; }
+  .opt.winner::before { content: "WINNER"; position: absolute; bottom: 8px; right: 10px; font-size: 10px; font-weight: 900; letter-spacing: .1em; }
+  .opt.loser { opacity: .4; }
+  .opt:disabled { cursor: default; }
+  @keyframes wiggle { 0%{transform:rotate(0)} 25%{transform:rotate(-3deg) scale(1.04)} 75%{transform:rotate(3deg) scale(1.04)} 100%{transform:rotate(0)} }
+  .margin { margin-top: 10px; border-top: 2px dashed var(--line); padding-top: 10px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .margin .lbl { font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--blue); }
+  .margin .lbl span { color: var(--muted); font-weight: 700; }
+  .stepper { display: inline-flex; border: 2px solid var(--line); border-radius: var(--r); overflow: hidden; }
+  .stepper button { background: #000; color: var(--ink); border: 0; width: 38px; font-size: 18px; font-weight: 900; }
+  .stepper button:disabled { opacity: .3; cursor: default; }
+  .stepper input { width: 64px; text-align: center; border: 0; border-left: 2px solid var(--line); border-right: 2px solid var(--line); border-radius: 0; padding: 8px 4px; font-weight: 900; font-size: 16px; -moz-appearance: textfield; }
+  .stepper input::-webkit-inner-spin-button { -webkit-appearance: none; }
+  .stepper.set { border-color: var(--blue); }
+  .margin .res { font-size: 12px; font-weight: 900; color: var(--ink); text-transform: uppercase; letter-spacing: .06em; }
+  .consensus { height: 10px; border-radius: 999px; background: #000; margin-top: 10px; overflow: hidden; display: flex; border: 1px solid var(--line); }
+  .consensus div { height: 100%; transition: width .4s; }
+  .consensus-lbl { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-top: 5px; font-weight: 700; }
+
+  .podium { display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 8px; align-items: end; margin-bottom: 16px; }
+  .pod { background: var(--card); border: 2px solid var(--ink); border-radius: var(--r); text-align: center; padding: 16px 6px 12px; position: relative; }
+  .pod .av { width: 52px; height: 52px; font-size: 20px; animation: bob 2.4s ease-in-out infinite; }
+  .pod.p1 { box-shadow: 6px 6px 0 var(--red); padding-top: 22px; } .pod.p1 .av { width: 68px; height: 68px; font-size: 26px; animation-duration: 1.8s; }
+  .pod.p2 { box-shadow: 6px 6px 0 var(--blue); } .pod.p3 { box-shadow: 6px 6px 0 var(--soft); }
+  @keyframes bob { 50% { transform: translateY(-6px) rotate(4deg); } }
+  .pod .nm { font-weight: 900; font-size: 15px; margin-top: 6px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .pod .sc { font-family: 'Archivo Black'; font-size: 26px; color: var(--ink); }
+  .pod .md { position: absolute; top: -12px; left: 50%; transform: translateX(-50%); font-family: 'Special Elite', monospace; background: #000; border: 2px solid var(--ink); padding: 0 8px; font-size: 13px; letter-spacing: .08em; }
+  .lb { display: flex; flex-direction: column; gap: 8px; }
+  .lb-row { display: grid; grid-template-columns: 40px 44px 1fr auto; align-items: center; gap: 10px; background: var(--card); border: 2px solid var(--line); border-radius: var(--r); padding: 10px 12px; animation: pop .3s ease; }
+  .lb-row.me { border-color: var(--ink); }
+  .lb-row .rank { font-family: 'Archivo Black'; font-size: 20px; color: var(--muted); text-align: center; }
+  .lb-row .nm { font-weight: 900; font-size: 15px; }
+  .lb-row .det { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .lb-row .score { text-align: right; }
+  .lb-row .score b { font-family: 'Archivo Black'; font-size: 24px; color: var(--ink); }
+  .lb-row .score small { display: block; color: var(--muted); font-size: 10px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; }
+  .badge { display: inline-block; margin-left: 6px; font-size: 9px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; padding: 2px 6px; border-radius: 999px; vertical-align: middle; }
+  .badge.oracle { background: var(--red); color: #fff; } .badge.contra { background: var(--blue); color: #fff; } .badge.sniper { background: var(--ink); color: #000; } .badge.cold { border: 1px solid var(--muted); color: var(--muted); }
+  .empty { text-align: center; color: var(--muted); padding: 40px 10px; font-size: 15px; }
+  .empty .big { font-family: 'Special Elite', monospace; font-size: 28px; color: var(--ink); margin-bottom: 8px; text-transform: uppercase; letter-spacing: .1em; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 16px; }
+  .stat { background: var(--card); border: 2px solid var(--ink); border-radius: var(--r); padding: 12px; text-align: center; }
+  .stat b { font-family: 'Archivo Black'; font-size: 30px; display: block; color: var(--ink); }
+  .stat span { font-family: 'Special Elite', monospace; font-size: 11px; color: var(--red); text-transform: uppercase; letter-spacing: .08em; }
+
+  .res-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0; border-bottom: 1px dashed var(--line); flex-wrap: wrap; }
+  .res-row:last-child { border-bottom: 0; }
+  .res-row .nm { font-weight: 900; }
+  .res-row .who { font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .res-btns { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+  .res-btns button { border-radius: var(--r); border: 2px solid var(--line); background: #000; color: var(--ink); padding: 7px 11px; font-weight: 900; font-size: 13px; }
+  .res-btns button.D.on { background: var(--dem); border-color: var(--dem); }
+  .res-btns button.R.on { background: var(--gop); border-color: var(--gop); }
+  .res-btns button.I.on { background: var(--ind); border-color: var(--ind); color: #000; }
+  .res-btns button.del { color: var(--red); font-size: 11px; letter-spacing: .08em; }
+  .res-btns .stepper input { width: 56px; }
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 10px; }
+  .form-grid .full { grid-column: 1 / -1; }
+  label.lab { display: block; font-size: 11px; font-weight: 900; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 4px; }
+  .check { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+  .check input { width: 18px; height: 18px; accent-color: var(--red); }
+
+  .toast { position: fixed; top: 14px; left: 50%; transform: translateX(-50%) rotate(-1deg); background: var(--ink); color: #000; border: 2px solid #000; border-radius: var(--r); padding: 10px 16px; font-weight: 700; font-size: 14px; z-index: 100; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; box-shadow: 4px 4px 0 var(--red); max-width: 90vw; text-align: center; line-height: 1.35; }
+  .toast .k { display: block; font-family: 'Special Elite', monospace; font-size: 10px; letter-spacing: .14em; color: var(--red); text-transform: uppercase; margin-bottom: 2px; }
+  .toast.show { opacity: 1; transform: translateX(-50%) rotate(1deg); }
+  .confetti { position: fixed; top: -14px; width: 10px; height: 18px; z-index: 99; pointer-events: none; animation: fall linear forwards; }
+  @keyframes fall { to { transform: translateY(110vh) rotate(720deg); opacity: .9; } }
+  .hidden { display: none !important; }
+  .hype { font-family: 'Special Elite', monospace; color: var(--red); font-size: 13px; text-transform: uppercase; letter-spacing: .06em; }
+  @media (max-width: 520px) { .stat b { font-size: 22px; } .form-grid { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="ticker"><span id="tickerTxt">ELECTION NIGHT PICKS — MAKE YOUR CALLS — NO COWARDS</span></div>
+<div class="wrap">
+  <header>
+    <div class="logo"><img src="logo.png" alt="FIGHT."><span class="sub">Election Night Picks</span></div>
+    <div class="pills">
+      <div class="pill" id="syncPill"><span class="dot"></span> <span id="syncTxt">connecting</span></div>
+      <div class="pill" id="lockPill"></div>
+    </div>
+  </header>
+
+  <!-- ONBOARDING -->
+  <section class="view" id="view-onboard">
+    <div class="card">
+      <h2>Who's calling it?</h2>
+      <p class="sub">Name + a color. Your initials become your badge on the board.</p>
+      <div style="margin-top:12px"><input type="text" id="nameInput" placeholder="Your name" maxlength="24" autocomplete="off"></div>
+      <div class="colors" id="colorGrid"></div>
+    </div>
+    <div class="card blue">
+      <h2>Conflict check</h2>
+      <p class="sub">Tap the races you work on. Honor system. Those get <b>locked out of your score</b> — you can still log a fan pick on them, it just won't count. Nobody has to pick against their own client.</p>
+      <div class="chips" id="conflictChips"></div>
+      <p class="sub" style="margin-top:10px">Only lock what you actually work on — locked races are points you can't earn.</p>
+    </div>
+    <div class="row" style="justify-content:flex-end">
+      <button class="btn red" id="startBtn">Let me in</button>
+    </div>
+  </section>
+
+  <!-- PICKS -->
+  <section class="view" id="view-picks">
+    <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+      <div class="row"><span id="meAv" class="av"></span><div><b id="meName" style="font-size:18px"></b><div class="sub" id="meConf"></div></div></div>
+      <div class="row"><span class="hype" id="pickProgress"></span><button class="btn ghost sm" id="editMeBtn">Edit me</button></div>
+    </div>
+    <p class="sub" style="margin:0 0 6px">Pick as many or as few as you want. Skipped races are just 0. Call the spread too for bonus points.</p>
+    <div id="raceList"></div>
+  </section>
+
+  <!-- LEADERBOARD -->
+  <section class="view" id="view-board">
+    <div class="stats">
+      <div class="stat"><b id="stPlayers">0</b><span>players</span></div>
+      <div class="stat"><b id="stCalled">0</b><span>called</span></div>
+      <div class="stat"><b id="stUpsets">0</b><span>office upsets</span></div>
+    </div>
+    <div id="podium"></div>
+    <div class="lb" id="leaderboard"></div>
+    <div class="card plain" style="margin-top:16px">
+      <h2 style="font-size:18px">The rules</h2>
+      <p class="sub" id="rulesTxt"></p>
+    </div>
+  </section>
+
+  <!-- RESULTS / ADMIN -->
+  <section class="view" id="view-results">
+    <div class="card" id="adminGate">
+      <h2>Results desk</h2>
+      <p class="sub">Whoever's on results duty enters the PIN once. Everyone else: watch, sweat.</p>
+      <div class="row" style="margin-top:10px"><input type="password" id="pinInput" placeholder="PIN" style="max-width:160px"><button class="btn" id="pinBtn">Unlock</button></div>
+    </div>
+    <div class="card"><h2 style="font-size:18px;margin-bottom:8px">Call the races</h2><p class="sub" style="margin:0 0 6px">Tap the winner, then type the final spread in points. For Senate/House control, type the winning party's seat total.</p><div id="resultsList"></div></div>
+    <div class="card blue hidden" id="manageCard">
+      <h2 style="font-size:18px">Manage races</h2>
+      <p class="sub">Add a race the office cares about, or delete one. Changes show up for everyone within a few seconds.</p>
+      <div class="form-grid">
+        <div class="full"><label class="lab">Race title</label><input type="text" id="rTitle" placeholder="e.g. NY-17 (Hudson Valley)"></div>
+        <div><label class="lab">Group</label><select id="rGroup"><option>Senate</option><option>Governor</option><option>House</option><option>Big picture</option><option>Other</option></select></div>
+        <div><label class="lab">Points for winner</label><input type="number" id="rPts" value="1" min="1" max="10"></div>
+        <div><label class="lab">Candidate 1</label><input type="text" id="rC1" placeholder="Name"></div>
+        <div><label class="lab">Party</label><select id="rP1"><option value="D">Democrat</option><option value="R">Republican</option><option value="I">Independent</option></select></div>
+        <div><label class="lab">Candidate 2</label><input type="text" id="rC2" placeholder="Name"></div>
+        <div><label class="lab">Party</label><select id="rP2"><option value="R">Republican</option><option value="D">Democrat</option><option value="I">Independent</option></select></div>
+        <div class="full"><label class="lab">Note (optional)</label><input type="text" id="rNote" placeholder="e.g. First bellwether of the night"></div>
+        <div class="full"><label class="lab">Position</label><select id="rPos"></select></div>
+        <div class="full check"><input type="checkbox" id="rMargin" checked> <label for="rMargin">Ask for margin too (<span id="mgBonusTxt"></span>)</label></div>
+        <div class="full"><button class="btn red" id="addRaceBtn">Add race</button></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<nav class="tabs">
+  <button data-view="picks">Picks</button>
+  <button data-view="board">Board</button>
+  <button data-view="results">Results</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script type="module">
+/* ============================================================
+   CONFIG — edit these
+   ============================================================ */
+const CONFIG = {
+  SUPABASE_URL: "https://rddidsuodnqgbbfnawzs.supabase.co",          // e.g. "https://abcd1234.supabase.co"  (blank = solo/demo mode)
+  SUPABASE_ANON_KEY: "sb_publishable_FoS1KTpBm2R7D9e1csN_cg_62Rd0OvM",
+  ADMIN_PIN: "2026",
+  LOCK_TIME: "2026-11-03T19:00:00-05:00", // picks freeze (7pm ET)
+  MARGIN_EXACT: 2,           // bonus for nailing the spread exactly (winner must be right)
+  MARGIN_CLOSE: 1,           // bonus for being within MARGIN_WINDOW points
+  MARGIN_WINDOW: 2,
+  POLL_MS: 8000,
+};
+
+/* ============================================================
+   DEFAULT SLATE — used until an admin edits races in-app.
+   Every race asks for a margin. seats:N switches a race to "final seat count" mode.
+   Every race asks for a margin except "Big picture" ones.
+   ============================================================ */
+const DEFAULT_RACES = [
+  { id:"sen-tx", group:"Senate", title:"Texas Senate", opts:[{n:"James Talarico",p:"D"},{n:"Ken Paxton",p:"R"}] },
+  { id:"sen-mi", group:"Senate", title:"Michigan Senate", opts:[{n:"Abdul El-Sayed",p:"D"},{n:"Mike Rogers",p:"R"}] },
+  { id:"sen-nc", group:"Senate", title:"North Carolina Senate", opts:[{n:"Roy Cooper",p:"D"},{n:"Michael Whatley",p:"R"}] },
+  { id:"sen-ga", group:"Senate", title:"Georgia Senate", opts:[{n:"Jon Ossoff",p:"D"},{n:"Mike Collins",p:"R"}] },
+  { id:"sen-oh", group:"Senate", title:"Ohio Senate", opts:[{n:"Sherrod Brown",p:"D"},{n:"Jon Husted",p:"R"}] },
+  { id:"sen-me", group:"Senate", title:"Maine Senate", opts:[{n:"Troy Jackson",p:"D"},{n:"Susan Collins",p:"R"}] },
+  { id:"sen-nh", group:"Senate", title:"New Hampshire Senate", opts:[{n:"Chris Pappas",p:"D"},{n:"John Sununu",p:"R"}] },
+  { id:"sen-ia", group:"Senate", title:"Iowa Senate", opts:[{n:"Josh Turek",p:"D"},{n:"Ashley Hinson",p:"R"}] },
+  { id:"sen-sc", group:"Senate", title:"South Carolina Senate", opts:[{n:"Annie Andrews",p:"D"},{n:"Darline Graham",p:"R"}] },
+  { id:"gov-tx", group:"Governor", title:"Texas Governor", opts:[{n:"Gina Hinojosa",p:"D"},{n:"Greg Abbott",p:"R"}] },
+  { id:"gov-ga", group:"Governor", title:"Georgia Governor", opts:[{n:"Keisha Lance Bottoms",p:"D"},{n:"Rick Jackson",p:"R"}] },
+  { id:"gov-mi", group:"Governor", title:"Michigan Governor", opts:[{n:"Jocelyn Benson",p:"D"},{n:"John James",p:"R"}] },
+  { id:"gov-nv", group:"Governor", title:"Nevada Governor", opts:[{n:"Aaron Ford",p:"D"},{n:"Joe Lombardo",p:"R"}] },
+  { id:"gov-wi", group:"Governor", title:"Wisconsin Governor", opts:[{n:"David Crowley",p:"D"},{n:"Tom Tiffany",p:"R"}] },
+  { id:"hse-ky6", group:"House", title:"KY-06 (Lexington)", note:"First bellwether of the night", opts:[{n:"Zach Dembo",p:"D"},{n:"Ralph Alvarado",p:"R"}] },
+  { id:"hse-mi7", group:"House", title:"MI-07 (Lansing)", opts:[{n:"William Lawrence",p:"D"},{n:"Tom Barrett",p:"R"}] },
+  { id:"hse-nc1", group:"House", title:"NC-01 (Eastern NC)", opts:[{n:"Don Davis",p:"D"},{n:"Laurie Buckhout",p:"R"}] },
+  { id:"hse-nc11", group:"House", title:"NC-11 (Asheville)", opts:[{n:"Jamie Ager",p:"D"},{n:"Jennifer Balkcom",p:"R"}] },
+  { id:"hse-ca22", group:"House", title:"CA-22 (Central Valley)", opts:[{n:"Randy Villegas",p:"D"},{n:"David Valadao",p:"R"}] },
+  { id:"hse-fl22", group:"House", title:"FL-22 (open seat)", opts:[{n:"Pia Dandiya",p:"D"},{n:"Casey Askar",p:"R"}] },
+  { id:"ctl-sen", group:"Big picture", title:"Who controls the Senate?", pts:2, seats:100, opts:[{n:"Democrats",p:"D"},{n:"Republicans",p:"R"}] },
+  { id:"ctl-hse", group:"Big picture", title:"Who controls the House?", pts:2, seats:435, opts:[{n:"Democrats",p:"D"},{n:"Republicans",p:"R"}] },
+].map((r,i) => ({ sort:i, pts:1, margin:true, note:"", ...r }));
+const GROUP_ORDER = ["Senate","Governor","House","Big picture","Other"];
+const COLORS = ["W","R","B","K"];
+const HYPE = ["No cowards.","Lock it in.","Bold calls only.","Trust your gut.","The office is watching.","Big night energy.","Pick with your chest.","Respect the spread.","Make the ad, then make the call."];
+const FACTS = [
+  "Election Day is the first Tuesday after the first Monday in November — a rule Congress set in 1845.",
+  "Tuesday was picked so farmers could get to the county seat after Sunday church and still be home before Wednesday market day.",
+  "George Washington ran unopposed in 1789 and 1792. Nobody has managed it since.",
+  "Senators were chosen by state legislatures until the 17th Amendment made them directly elected in 1913.",
+  "Wyoming let women vote in 1869 — 51 years before the 19th Amendment.",
+  "The 26th Amendment, lowering the voting age to 18, was ratified in about 100 days in 1971. Fastest ever.",
+  "Florida 2000 came down to 537 votes out of nearly 6 million cast.",
+  "Minnesota's 2008 Senate race was decided by 312 votes after a recount that stretched into July.",
+  "A 2017 Virginia House of Delegates race ended in a tie and was settled by drawing a name from a bowl.",
+  "North Dakota is the only state with no voter registration at all.",
+  "Maine and Nebraska split their electoral votes by congressional district. Everyone else is winner-take-all.",
+  "Dixville Notch, New Hampshire votes at midnight and reports within minutes.",
+  "Oregon became the first all-vote-by-mail state after voters approved it in 1998.",
+  "The word 'ballot' comes from the Italian 'ballotta' — a little ball, once dropped in a box to vote.",
+  "Victoria Woodhull ran for president in 1872 — 48 years before women could vote nationwide.",
+  "Shirley Chisholm became the first Black woman elected to Congress in 1968 and ran for president in 1972.",
+  "The Chicago Tribune's 'Dewey Defeats Truman' headline went to press before the 1948 count finished. It didn't.",
+  "Australia has had compulsory voting since 1924. Turnout runs north of 90 percent.",
+  "New Zealand was the first country to give women the vote, in 1893.",
+  "In 1876 the presidency was decided by a 15-member commission after four states sent disputed returns.",
+  "Kennedy beat Nixon in 1960 by about 0.17 percent of the popular vote.",
+  "Vermont and Maine never take away the vote for a felony conviction — even while incarcerated.",
+  "The Senate has 100 seats, but only about a third are up in any given election.",
+  "The House has been 435 seats since 1913, when the country had under 100 million people.",
+];
+
+/* ============================================================
+   STORAGE — Supabase if configured, else localStorage
+   ============================================================ */
+let sb = null;
+const useSB = !!(CONFIG.SUPABASE_URL && CONFIG.SUPABASE_ANON_KEY);
+if (useSB) {
+  const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm");
+  sb = createClient(CONFIG.SUPABASE_URL, CONFIG.SUPABASE_ANON_KEY);
+}
+const LS = { get(k,d){ try { return JSON.parse(localStorage.getItem(k)) ?? d; } catch { return d; } }, set(k,v){ localStorage.setItem(k, JSON.stringify(v)); } };
+const store = {
+  async loadAll(){
+    if (useSB) {
+      const [{data:picks},{data:results},{data:races}] = await Promise.all([ sb.from("picks").select("*"), sb.from("results").select("*"), sb.from("en_races").select("*").order("sort") ]);
+      return { picks:picks||[], results:Object.fromEntries((results||[]).map(r=>[r.race_id,{winner:r.winner,margin:r.margin}])), races:(races||[]).map(r=>({...r, opts: typeof r.opts==="string"?JSON.parse(r.opts):r.opts})) };
+    }
+    return { picks:LS.get("en_picks",[]), results:LS.get("en_results",{}), races:LS.get("en_races",[]) };
+  },
+  async savePicks(rows){
+    if (useSB) { const {error} = await sb.from("picks").upsert(rows,{onConflict:"name,race_id"}); if (error) throw error; return; }
+    const all = LS.get("en_picks",[]).filter(p => !rows.some(r => r.name===p.name && r.race_id===p.race_id)); LS.set("en_picks", all.concat(rows));
+  },
+  async saveResult(race_id, winner, margin){
+    if (useSB) {
+      if (winner) { const {error} = await sb.from("results").upsert({race_id, winner, margin: margin ?? null}); if (error) throw error; }
+      else { const {error} = await sb.from("results").delete().eq("race_id",race_id); if (error) throw error; }
+      return;
+    }
+    const r = LS.get("en_results",{}); if (winner) r[race_id]={winner, margin:margin ?? null}; else delete r[race_id]; LS.set("en_results",r);
+  },
+  async saveRaces(rows){
+    if (useSB) { const {error} = await sb.from("en_races").upsert(rows.map(r=>({id:r.id, sort:r.sort, grp:r.group, title:r.title, note:r.note||"", pts:r.pts||1, margin:!!r.margin, opts:r.opts, seats:r.seats||null}))); if (error) throw error; return; }
+    const cur = LS.get("en_races",[]).filter(x => !rows.some(r=>r.id===x.id)); LS.set("en_races", cur.concat(rows));
+  },
+  async deleteRace(id){
+    if (useSB) { const {error} = await sb.from("en_races").delete().eq("id",id); if (error) throw error; return; }
+    LS.set("en_races", LS.get("en_races",[]).filter(r=>r.id!==id));
+  }
+};
+
+/* ============================================================
+   STATE
+   ============================================================ */
+const state = {
+  me: LS.get("en_me", null),             // {name, avatar(color), conflicts}
+  myPicks: LS.get("en_mypicks", {}),
+  myMargins: LS.get("en_mymargins", {}),  // race_id -> number (string)
+  all: { picks:[], results:{}, races:[] },
+  admin: sessionStorage.getItem("en_admin")==="1",
+  lastCalledCount: null, prevResults: {},
+};
+let RACES = DEFAULT_RACES.slice();
+let racesSeeded = false;
+const RACE_BY_ID = () => Object.fromEntries(RACES.map(r=>[r.id,r]));
+const ptsOf = r => r.pts || 1;
+const isLocked = () => Date.now() > new Date(CONFIG.LOCK_TIME).getTime();
+const $ = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const pc = p => p==="D"?"var(--dem)":p==="R"?"var(--gop)":"var(--ind)";
+const short = t => t.replace(" Senate"," Sen").replace(" Governor"," Gov").replace(/ \(.*\)/,"");
+const initials = n => n.trim().split(/\s+/).map(w=>w[0]).join("").slice(0,2).toUpperCase() || "?";
+const avatar = (name, color, extra="") => `<span class="av ${COLORS.includes(color)?color:"W"} ${extra}">${esc(initials(name||""))}</span>`;
+const mgNum = v => (v===null||v===undefined||v==="") ? null : Number(v);
+const marginBonus = (guess, actual) => { const g=mgNum(guess), a=mgNum(actual); if (g===null||a===null||isNaN(g)||isNaN(a)) return 0; const d=Math.abs(g-a); return d===0?CONFIG.MARGIN_EXACT : d<=CONFIG.MARGIN_WINDOW?CONFIG.MARGIN_CLOSE : 0; };
+
+/* ============================================================
+   SCORING
+   ============================================================ */
+function computeBoard(){
+  const { picks, results } = state.all;
+  const players = {};
+  for (const p of picks) {
+    players[p.name] ??= { name:p.name, avatar:p.avatar, picks:{}, margins:{}, conflicts:new Set() };
+    players[p.name].avatar = p.avatar || players[p.name].avatar;
+    if (p.conflict) players[p.name].conflicts.add(p.race_id);
+    if (p.pick) { players[p.name].picks[p.race_id] = p.pick; if (p.margin!==null && p.margin!==undefined && p.margin!=="") players[p.name].margins[p.race_id] = p.margin; }
+  }
+  const consensus = {};
+  for (const r of RACES) {
+    const c = {}; let total = 0;
+    for (const pl of Object.values(players)) { if (pl.conflicts.has(r.id)) continue; const pk = pl.picks[r.id]; if (!pk) continue; c[pk]=(c[pk]||0)+1; total++; }
+    consensus[r.id] = { counts:c, total };
+  }
+  const rows = Object.values(players).map(pl => {
+    let pts=0, right=0, calledPicked=0, marginsHit=0, badges=[];
+    for (const r of RACES) {
+      const res = results[r.id]; if (!res) continue;
+      if (pl.conflicts.has(r.id)) continue;
+      const pk = pl.picks[r.id]; if (!pk) continue;
+      calledPicked++;
+      if (pk === res.winner) {
+        pts += ptsOf(r); right++;
+        if (r.margin) { const b = marginBonus(pl.margins[r.id], res.margin); if (b) { pts += b; marginsHit++; } }
+        const cs = consensus[r.id]; const share = cs.total ? (cs.counts[res.winner]||0)/cs.total : 1;
+        if (share < .35 && cs.total >= 3) badges.push("contra");
+      }
+    }
+    const acc = calledPicked ? right/calledPicked : 0;
+    if (marginsHit >= 2) badges.push("sniper");
+    return { ...pl, pts, right, calledPicked, marginsHit, acc, badges:[...new Set(badges)] };
+  });
+  rows.sort((a,b) => b.pts - a.pts || b.acc - a.acc || a.name.localeCompare(b.name));
+  const anyCalled = Object.keys(results).length > 0;
+  if (anyCalled && rows.length) { rows[0].badges.unshift("oracle"); if (rows.length > 2) rows[rows.length-1].badges.push("cold"); }
+  let upsets = 0;
+  for (const r of RACES) { const res = results[r.id]; if (!res) continue; const cs = consensus[r.id]; if (!cs.total) continue; const fav = Object.entries(cs.counts).sort((a,b)=>b[1]-a[1])[0][0]; if (fav !== res.winner) upsets++; }
+  return { rows, consensus, upsets, anyCalled };
+}
+const BADGE_LBL = { oracle:"Oracle", contra:"Contrarian", sniper:"Sniper", cold:"Ice cold" };
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function renderHeader(){
+  const lp = $("#lockPill");
+  if (isLocked()) { lp.className="pill locked"; lp.textContent="Picks locked"; }
+  else { const ms = new Date(CONFIG.LOCK_TIME)-Date.now(); lp.className="pill"; lp.textContent=`Lock in ${Math.floor(ms/3.6e6)}h ${Math.floor(ms%3.6e6/6e4)}m`; }
+  $("#syncPill").className = "pill " + (useSB ? "live" : "");
+  $("#syncTxt").textContent = useSB ? "live" : "solo mode";
+  $("#mgBonusTxt").textContent = `+${CONFIG.MARGIN_EXACT} exact, +${CONFIG.MARGIN_CLOSE} within ${CONFIG.MARGIN_WINDOW}`;
+  $("#rulesTxt").innerHTML = `1 pt per correct call (2 for chamber control). Every race also asks for the spread in points (for Senate and House control, the winner's final seat count): nail it exactly for +${CONFIG.MARGIN_EXACT}, land within ${CONFIG.MARGIN_WINDOW} for +${CONFIG.MARGIN_CLOSE} — only if you also got the winner. <b>Pick as many as you want; more picks + more right = higher.</b> Skipped races are just 0. Races you work on are locked out (fan picks don't score). Ties break on accuracy.<br><br>Badges — <b>Oracle</b>: #1 · <b>Contrarian</b>: right when under 35% of the office agreed · <b>Sniper</b>: 2+ margins hit · <b>Ice cold</b>: last place, sorry.`;
+}
+function renderTicker(){
+  const { results } = state.all; const rb = RACE_BY_ID();
+  const items = [];
+  for (const [id,res] of Object.entries(results)) if (rb[id]) items.push(`CALLED — ${rb[id].title.toUpperCase()}: ${res.winner.toUpperCase()}${hasVal(res.margin)?(rb[id].seats?` ${split(rb[id],res.margin)}`:` BY ${res.margin}`):""}`);
+  const n = new Set(state.all.picks.filter(p=>p.pick).map(p=>p.name)).size;
+  items.push(n ? `${n} ${n===1?"PERSON HAS":"PEOPLE HAVE"} MADE PICKS` : "NOBODY HAS PICKED YET. BE BRAVE.");
+  items.push(HYPE[Math.floor(Date.now()/60000)%HYPE.length].toUpperCase());
+  $("#tickerTxt").textContent = items.join("   ///   ") + "   ///   ";
+}
+function renderOnboard(){
+  const me = state.me || { name:"", avatar:"W", conflicts:[] };
+  $("#nameInput").value = me.name;
+  $("#colorGrid").innerHTML = COLORS.map(c => `<button data-c="${c}" class="${c} ${c===me.avatar?'sel':''}" title="${c}"></button>`).join("");
+  $$("#colorGrid button").forEach(b => b.onclick = () => { $$("#colorGrid button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); });
+  $("#conflictChips").innerHTML = RACES.filter(r=>r.group!=="Big picture").map(r => `<button class="chip ${me.conflicts.includes(r.id)?'sel':''}" data-r="${r.id}">${esc(short(r.title))}</button>`).join("");
+  $$("#conflictChips .chip").forEach(c => c.onclick = () => c.classList.toggle("sel"));
+}
+function stepper(raceId, val, disabled, cls="", max=99){
+  const set = val!==null && val!==undefined && val!=="";
+  return `<span class="stepper ${set?'set':''} ${cls}"><button data-step="-1" data-r="${raceId}" ${disabled?'disabled':''}>−</button><input type="number" min="0" max="${max}" data-max="${max}" inputmode="numeric" placeholder="—" value="${set?esc(val):''}" data-mg="${raceId}" ${disabled?'disabled':''}><button data-step="1" data-r="${raceId}" ${disabled?'disabled':''}>+</button></span>`;
+}
+function renderPicks(){
+  const me = state.me; if (!me) return;
+  const { consensus } = computeBoard();
+  const results = state.all.results; const locked = isLocked();
+  $("#meAv").outerHTML = avatar(me.name, me.avatar).replace('class="av', 'id="meAv" class="av'); $("#meName").textContent = me.name;
+  const rb = RACE_BY_ID();
+  const confs = me.conflicts.filter(id=>rb[id]);
+  $("#meConf").textContent = confs.length ? `Locked out of: ${confs.map(id=>short(rb[id].title)).join(", ")}` : "No conflicts — the whole board is yours";
+  const eligible = RACES.filter(r=>!me.conflicts.includes(r.id)); const done = eligible.filter(r=>state.myPicks[r.id]).length;
+  $("#pickProgress").textContent = `${done}/${eligible.length} picked${done===eligible.length&&done?" — full send":""}`;
+  const groups = GROUP_ORDER.filter(g => RACES.some(r=>r.group===g));
+  let html = "";
+  for (const g of groups) {
+    html += `<div class="section-title"><h2>${esc(g)}</h2><span class="count">${RACES.filter(r=>r.group===g).length} races</span></div>`;
+    for (const r of RACES.filter(x=>x.group===g)) {
+      const conf = me.conflicts.includes(r.id); const res = results[r.id]; const my = state.myPicks[r.id]; const myM = state.myMargins[r.id]; const cs = consensus[r.id];
+      const disabled = locked || !!res;
+      html += `<div class="race ${conf?'conflict':''} ${res?'called':''}">
+        ${res?`<div class="stamp">Called</div>`:""}
+        <div class="race-head"><div><h3>${esc(r.title)}</h3>${r.note?`<div class="meta">${esc(r.note)}</div>`:""}</div>
+          <div class="tags">${conf?'<span class="tag conf">Your race · fan pick only</span>':''}${ptsOf(r)>1?`<span class="tag pts">${ptsOf(r)} pts</span>`:''}${r.margin?`<span class="tag mg">${r.seats?"Seat count bonus":"Margin bonus"}</span>`:''}</div></div>
+        <div class="opts">${r.opts.map(o => `<button class="opt ${o.p} ${conf?'heart':''} ${my===o.n?'sel':''} ${res?(res.winner===o.n?'winner':'loser'):''}" data-r="${r.id}" data-p="${esc(o.n)}" ${disabled?'disabled':''}><span class="nm">${esc(o.n)}</span><span class="pt">${o.p==="D"?"Democrat":o.p==="R"?"Republican":"Independent"}</span></button>`).join("")}</div>
+        ${r.margin ? (r.seats
+          ? `<div class="margin"><span class="lbl">Final count <span>— ${esc((my||"Dems").split(" ").pop())} seats${hasVal(myM)?` → ${split(r,myM)}`:""}</span></span>${stepper(r.id, myM, disabled||!my, "", r.seats)}${res&&hasVal(res.margin)?`<span class="res">Actual: ${esc(split(r,res.margin))}${hasVal(myM)&&my===res.winner?` · ${marginBonus(myM,res.margin)?`+${marginBonus(myM,res.margin)} bonus`:"no bonus"}`:""}</span>`:""}</div>`
+          : `<div class="margin"><span class="lbl">${my?`${esc(my.split(" ").pop())} wins by`:"Margin"} <span>${my?"pts":"— pick a winner first"}</span></span>${stepper(r.id, myM, disabled||!my)}${res&&hasVal(res.margin)?`<span class="res">Actual: ${esc(res.margin)}${hasVal(myM)&&my===res.winner?` · ${marginBonus(myM,res.margin)?`+${marginBonus(myM,res.margin)} bonus`:"no bonus"}`:""}</span>`:""}</div>`) : ""}
+        ${cs.total ? `<div class="consensus">${r.opts.map(o=>`<div style="width:${100*(cs.counts[o.n]||0)/cs.total}%;background:${pc(o.p)}"></div>`).join("")}</div>
+        <div class="consensus-lbl"><span>Office says: ${r.opts.map(o=>`${esc(o.n.split(" ").pop())} ${Math.round(100*(cs.counts[o.n]||0)/cs.total)}%`).join(" · ")}</span><span>${cs.total} ${cs.total===1?'pick':'picks'}</span></div>` : `<div class="consensus-lbl"><span>No office picks yet — be first</span></div>`}
+      </div>`;
+    }
+  }
+  $("#raceList").innerHTML = html;
+  $$("#raceList .opt").forEach(b => b.onclick = () => makePick(b.dataset.r, b.dataset.p));
+  wireSteppers("#raceList", (id, v) => makeMargin(id, v));
+}
+function wireSteppers(scope, onChange){
+  $$(`${scope} input[data-mg]`).forEach(i => i.onchange = () => onChange(i.dataset.mg, clampMg(i.value, Number(i.dataset.max))));
+  $$(`${scope} button[data-step]`).forEach(b => b.onclick = () => { const i = $(`${scope} input[data-mg="${b.dataset.r}"]`); const max = Number(i.dataset.max); const cur = i.value===""?(max>99?Math.floor(max/2):0):Number(i.value); onChange(b.dataset.r, clampMg(cur + Number(b.dataset.step), max)); });
+}
+const clampMg = (v, max=99) => { if (v==="" || v===null) return null; const n = Math.round(Number(v)); if (isNaN(n)) return null; return String(Math.max(0, Math.min(max, n))); };
+const hasVal = v => v!==null && v!==undefined && v!=="";
+const split = (r, v) => hasVal(v) ? `${v}–${r.seats - Number(v)}` : "";
+function renderBoard(){
+  const { rows, upsets, anyCalled } = computeBoard();
+  $("#stPlayers").textContent = rows.length; $("#stCalled").textContent = Object.keys(state.all.results).length; $("#stUpsets").textContent = upsets;
+  if (!rows.length) { $("#podium").innerHTML=""; $("#leaderboard").innerHTML = `<div class="empty"><div class="big">Crickets</div>Nobody's picked yet. Be the first, be the legend.</div>`; return; }
+  if (anyCalled && rows.length >= 3) {
+    const [a,b,c] = rows;
+    const pod = (p,cls,md) => `<div class="pod ${cls}"><div class="md">${md}</div>${avatar(p.name,p.avatar)}<div class="nm">${esc(p.name)}</div><div class="sc">${p.pts}</div></div>`;
+    $("#podium").innerHTML = `<div class="podium">${pod(b,"p2","2ND")}${pod(a,"p1","1ST")}${pod(c,"p3","3RD")}</div>`;
+  } else $("#podium").innerHTML = anyCalled ? "" : `<div class="empty" style="padding:14px"><div class="big">Standby</div>Board goes live when the first race is called.</div>`;
+  $("#leaderboard").innerHTML = rows.map((p,i) => {
+    const picked = Object.keys(p.picks).filter(id=>!p.conflicts.has(id)).length;
+    return `<div class="lb-row ${p.name===state.me?.name?'me':''}">
+      <div class="rank">${anyCalled?`#${i+1}`:"–"}</div>${avatar(p.name,p.avatar)}
+      <div><div class="nm">${esc(p.name)}${p.badges.map(b=>`<span class="badge ${b}">${BADGE_LBL[b]}</span>`).join("")}</div>
+        <div class="det">${anyCalled ? `${p.right}/${p.calledPicked} right · ${Math.round(p.acc*100)}%${p.marginsHit?` · ${p.marginsHit} margin${p.marginsHit>1?"s":""} hit`:""}` : `${picked} picks in`}${p.conflicts.size?` · ${p.conflicts.size} locked`:""}</div></div>
+      <div class="score"><b>${anyCalled ? p.pts : "—"}</b><small>${anyCalled?"pts":"waiting"}</small></div>
+    </div>`;
+  }).join("");
+}
+function renderPosOptions(){
+  const g = $("#rGroup").value; const inGroup = RACES.filter(r=>r.group===g);
+  const keep = $("#rPos").value;
+  $("#rPos").innerHTML = `<option value="top">Top of ${esc(g)}</option>` + inGroup.map(r=>`<option value="after:${r.id}">After ${esc(r.title)}</option>`).join("") + `<option value="bottom">Bottom of ${esc(g)}</option>`;
+  if ([...$("#rPos").options].some(o=>o.value===keep)) $("#rPos").value = keep;
+}
+function renderResults(){
+  renderPosOptions();
+  $("#adminGate").classList.toggle("hidden", state.admin);
+  $("#manageCard").classList.toggle("hidden", !state.admin);
+  const results = state.all.results; const { consensus } = computeBoard();
+  $("#resultsList").innerHTML = RACES.map(r => {
+    const res = results[r.id]; const cs = consensus[r.id];
+    const fav = cs.total ? Object.entries(cs.counts).sort((a,b)=>b[1]-a[1])[0] : null;
+    const hasM = res && res.margin!==null && res.margin!==undefined && res.margin!=="";
+    return `<div class="res-row"><div><div class="nm">${esc(r.title)} ${res?`<span class="tag ok">${esc(res.winner)}${hasM?(r.seats?` ${esc(split(r,res.margin))}`:` by ${esc(res.margin)}`):""}</span>`:""}</div>
+      <div class="who">${fav?`Office favorite: ${esc(fav[0])} (${Math.round(100*fav[1]/cs.total)}%)`:"No picks yet"}${r.seats?" · enter the winner's seat total":""}</div></div>
+      ${state.admin ? `<div class="res-btns">${r.opts.map(o=>`<button class="${o.p} ${res?.winner===o.n?'on':''}" data-r="${r.id}" data-w="${esc(o.n)}">${esc(o.n)}</button>`).join("")}
+        ${r.margin && res ? `<span class="sub">${r.seats?"seats for winner":"by"}</span>${stepper(r.id, res.margin, false, "", r.seats||99)}` : ""}
+        ${res?`<button data-r="${r.id}" data-w="">Undo</button>`:""}<button data-move="-1" data-id="${r.id}" title="Move up">&#9650;</button><button data-move="1" data-id="${r.id}" title="Move down">&#9660;</button><button class="del" data-del="${r.id}">DELETE</button></div>` : ""}
+    </div>`;
+  }).join("");
+  $$("#resultsList button[data-w]").forEach(b => b.onclick = () => callRace(b.dataset.r, b.dataset.w));
+  wireSteppers("#resultsList", (id, v) => callRace(id, results[id].winner, v));
+  $$("#resultsList button[data-del]").forEach(b => b.onclick = () => deleteRace(b.dataset.del));
+  $$("#resultsList button[data-move]").forEach(b => b.onclick = () => moveRace(b.dataset.id, Number(b.dataset.move)));
+}
+function renderAll(){ renderHeader(); renderTicker(); if (state.me) { renderPicks(); renderBoard(); renderResults(); } }
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+function myRow(raceId){ const me = state.me; return { name:me.name, avatar:me.avatar, race_id:raceId, pick:state.myPicks[raceId]||null, margin:state.myMargins[raceId] ?? null, conflict:me.conflicts.includes(raceId) }; }
+async function makePick(raceId, pick){
+  if (isLocked()) return toast("Picks are locked.");
+  if (state.all.results[raceId]) return toast("Already called. Too slow.");
+  const toggledOff = state.myPicks[raceId] === pick;
+  state.myPicks[raceId] = toggledOff ? null : pick;
+  delete state.myMargins[raceId];
+  LS.set("en_mypicks", state.myPicks); LS.set("en_mymargins", state.myMargins);
+  pushMine(raceId);
+  if (!toggledOff) toastFun();
+}
+async function makeMargin(raceId, val){
+  if (isLocked()) return toast("Picks are locked.");
+  if (val===null) delete state.myMargins[raceId]; else state.myMargins[raceId] = val;
+  LS.set("en_mymargins", state.myMargins);
+  pushMine(raceId);
+}
+async function pushMine(raceId){
+  const row = myRow(raceId);
+  state.all.picks = state.all.picks.filter(p => !(p.name===row.name && p.race_id===raceId)).concat([row]);
+  renderPicks(); renderBoard(); renderTicker();
+  try { await store.savePicks([row]); } catch(e){ console.error(e); toast("Couldn't save — check connection"); }
+}
+async function saveMe(){
+  const name = $("#nameInput").value.trim(); if (!name) return toast("Need a name, champ.");
+  if (isLocked() && state.me && state.me.name !== name) return toast("Locked — no identity swaps now.");
+  const color = $("#colorGrid .sel")?.dataset.c || "W";
+  const conflicts = $$("#conflictChips .sel").map(c=>c.dataset.r);
+  if (isLocked() && state.me && JSON.stringify([...state.me.conflicts].sort()) !== JSON.stringify([...conflicts].sort())) return toast("Locked — conflicts are frozen.");
+  state.me = { name, avatar:color, conflicts }; LS.set("en_me", state.me);
+  const rows = RACES.map(r => myRow(r.id));
+  state.all.picks = state.all.picks.filter(p => p.name !== name).concat(rows);
+  try { await store.savePicks(rows); } catch(e){ console.error(e); toast("Couldn't sync — check Supabase setup"); }
+  showView("picks"); renderAll(); toast(`Let's go, ${name}.`);
+}
+async function callRace(raceId, winner, margin){
+  if (!state.admin) return;
+  const prev = state.all.results[raceId];
+  if (winner) state.all.results[raceId] = { winner, margin: margin!==undefined ? margin : (prev && prev.winner===winner ? prev.margin : null) };
+  else delete state.all.results[raceId];
+  renderAll();
+  try { await store.saveResult(raceId, winner, state.all.results[raceId]?.margin ?? null); } catch(e){ console.error(e); toast("Couldn't save result"); }
+  if (winner && winner !== prev?.winner) { toast(`${RACE_BY_ID()[raceId].title}: ${winner}.`, "Called"); confetti(); }
+}
+async function ensureSeeded(){ if (racesSeeded) return; await store.saveRaces(RACES); racesSeeded = true; }
+async function addRace(){
+  const title = $("#rTitle").value.trim(), c1 = $("#rC1").value.trim(), c2 = $("#rC2").value.trim();
+  if (!title || !c1 || !c2) return toast("Need a title and two candidates.");
+  const id = "x-" + title.toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"") + "-" + Date.now().toString(36).slice(-4);
+  const group = $("#rGroup").value;
+  const r = { id, sort:0, group, title, note:$("#rNote").value.trim(), pts:Math.max(1,+$("#rPts").value||1), margin:$("#rMargin").checked, opts:[{n:c1,p:$("#rP1").value},{n:c2,p:$("#rP2").value}] };
+  const pos = $("#rPos").value; const inGroup = RACES.filter(x=>x.group===group);
+  let at;
+  if (pos==="top") at = inGroup.length ? RACES.indexOf(inGroup[0]) : RACES.length;
+  else if (pos.startsWith("after:")) { const i = RACES.findIndex(x=>x.id===pos.slice(6)); at = i<0 ? RACES.length : i+1; }
+  else at = inGroup.length ? RACES.indexOf(inGroup[inGroup.length-1])+1 : RACES.length;
+  RACES.splice(at, 0, r);
+  RACES.forEach((x,i)=>x.sort=i);
+  try { await store.saveRaces(RACES); racesSeeded = true; } catch(e){ console.error(e); RACES = RACES.filter(x=>x.id!==id); return toast(`Couldn't save race: ${e.message||e.code||"check the races table"}`); }
+  ["#rTitle","#rC1","#rC2","#rNote"].forEach(s=>$(s).value=""); $("#rMargin").checked=true; $("#rPts").value=1;
+  renderAll(); toast(`Added: ${title}`);
+}
+async function moveRace(id, dir){
+  const i = RACES.findIndex(x=>x.id===id); const j = i + dir;
+  if (i<0 || j<0 || j>=RACES.length) return;
+  if (RACES[j].group !== RACES[i].group) return toast("That's the edge of the group.");
+  [RACES[i], RACES[j]] = [RACES[j], RACES[i]];
+  RACES.forEach((x,k)=>x.sort=k);
+  renderAll();
+  try { await store.saveRaces(RACES); racesSeeded = true; } catch(e){ console.error(e); toast(`Couldn't save order: ${e.message||e.code}`); }
+}
+async function deleteRace(id){
+  const r = RACE_BY_ID()[id]; if (!r) return;
+  if (!confirm(`Delete "${r.title}"? Everyone's picks on it stop counting.`)) return;
+  RACES = RACES.filter(x=>x.id!==id);
+  try { await ensureSeeded(); await store.deleteRace(id); } catch(e){ console.error(e); return toast(`Couldn't delete: ${e.message||e.code}`); }
+  renderAll(); toast(`Deleted ${r.title}`);
+}
+function showView(v){
+  $$(".view").forEach(x => x.classList.remove("active"));
+  $("#view-"+(state.me ? v : "onboard")).classList.add("active");
+  $$("nav.tabs button").forEach(b => b.classList.toggle("active", b.dataset.view===v));
+  $("nav.tabs").classList.toggle("hidden", !state.me);
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+let toastT; function toast(msg, kicker){ const t=$("#toast"); t.innerHTML = (kicker?`<span class="k">${esc(kicker)}</span>`:"") + esc(msg); t.classList.add("show"); clearTimeout(toastT); toastT=setTimeout(()=>t.classList.remove("show"), kicker==="Fun fact"?5200:2400); }
+let factIdx = Math.floor(Math.random()*FACTS.length);
+function toastFun(){ if (Math.random() < 0.5) { toast(FACTS[factIdx++ % FACTS.length], "Fun fact"); } else toast(HYPE[Math.floor(Math.random()*HYPE.length)]); }
+function confetti(){ const cols=["#fff","#E0202B","#2356E6"]; for(let i=0;i<60;i++){ const s=document.createElement("div"); s.className="confetti"; s.style.background=cols[i%3]; s.style.left=Math.random()*100+"vw"; s.style.animationDuration=(1.8+Math.random()*1.6)+"s"; s.style.animationDelay=(Math.random()*.6)+"s"; document.body.appendChild(s); setTimeout(()=>s.remove(),4000);} }
+
+/* ============================================================
+   SYNC LOOP
+   ============================================================ */
+async function refresh(){
+  try {
+    const data = await store.loadAll();
+    if (data.races.length) { RACES = data.races.map(r=>({ ...r, group: r.group || r.grp })).sort((a,b)=>(a.sort||0)-(b.sort||0)); racesSeeded = true; }
+    const calledNow = Object.keys(data.results).length;
+    if (state.lastCalledCount !== null && calledNow > state.lastCalledCount && !state.admin) {
+      const newest = Object.keys(data.results).find(id => !(id in state.prevResults));
+      if (newest) { toast(`${RACE_BY_ID()[newest]?.title}: ${data.results[newest].winner}.`, "Called"); confetti(); }
+    }
+    state.all = data; state.prevResults = { ...data.results }; state.lastCalledCount = calledNow;
+    renderAll();
+  } catch(e){ console.error(e); $("#syncTxt").textContent="offline"; $("#syncPill").className="pill locked"; }
+}
+
+/* ============================================================
+   WIRE UP
+   ============================================================ */
+$("#startBtn").onclick = saveMe;
+$("#editMeBtn").onclick = () => { renderOnboard(); showView("onboard"); $("nav.tabs").classList.add("hidden"); };
+$("#pinBtn").onclick = () => { if ($("#pinInput").value === CONFIG.ADMIN_PIN) { state.admin=true; sessionStorage.setItem("en_admin","1"); renderResults(); toast("You're on results duty. No pressure."); } else toast("Nope."); };
+$("#pinInput").addEventListener("keydown", e => { if (e.key==="Enter") $("#pinBtn").click(); });
+$("#addRaceBtn").onclick = addRace;
+$("#rGroup").onchange = renderPosOptions;
+$$("nav.tabs button").forEach(b => b.onclick = () => showView(b.dataset.view));
+
+renderOnboard();
+showView(state.me ? "picks" : "onboard");
+await refresh();
+setInterval(refresh, CONFIG.POLL_MS);
+setInterval(() => { renderHeader(); renderTicker(); }, 30000);
+</script>
+</body>
+</html>
