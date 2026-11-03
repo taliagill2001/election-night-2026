@@ -253,6 +253,11 @@
         <div class="full"><button class="btn red" id="addRaceBtn">Add race</button></div>
       </div>
     </div>
+    <div class="card hidden" id="playersCard">
+      <h2 style="font-size:18px">Players</h2>
+      <p class="sub">Remove someone and all their picks go with them. They can rejoin with the same name if it was a mistake.</p>
+      <div id="playersList"></div>
+    </div>
   </section>
 </div>
 
@@ -370,6 +375,10 @@ const store = {
   async saveRaces(rows){
     if (useSB) { const {error} = await sb.from("en_races").upsert(rows.map(r=>({id:r.id, sort:r.sort, grp:r.group, title:r.title, note:r.note||"", pts:r.pts||1, margin:!!r.margin, opts:r.opts, seats:r.seats||null}))); if (error) throw error; return; }
     const cur = LS.get("en_races",[]).filter(x => !rows.some(r=>r.id===x.id)); LS.set("en_races", cur.concat(rows));
+  },
+  async deletePlayer(name){
+    if (useSB) { const {error} = await sb.from("picks").delete().eq("name",name); if (error) throw error; return; }
+    LS.set("en_picks", LS.get("en_picks",[]).filter(p=>p.name!==name));
   },
   async deleteRace(id){
     if (useSB) { const {error} = await sb.from("en_races").delete().eq("id",id); if (error) throw error; return; }
@@ -568,6 +577,12 @@ function renderResults(){
   $$("#resultsList button[data-w]").forEach(b => b.onclick = () => callRace(b.dataset.r, b.dataset.w));
   wireSteppers("#resultsList", (id, v) => callRace(id, results[id].winner, v));
   $$("#resultsList button[data-del]").forEach(b => b.onclick = () => deleteRace(b.dataset.del));
+  $("#playersCard").classList.toggle("hidden", !state.admin);
+  if (state.admin) {
+    const { rows } = computeBoard();
+    $("#playersList").innerHTML = rows.length ? rows.map(p => `<div class="res-row"><div class="row">${avatar(p.name,p.avatar)}<div><div class="nm">${esc(p.name)}</div><div class="who">${Object.keys(p.picks).length} picks${p.conflicts.size?` · ${p.conflicts.size} locked`:""}</div></div></div><div class="res-btns"><button class="del" data-player="${esc(p.name)}">REMOVE</button></div></div>`).join("") : `<div class="sub">Nobody yet.</div>`;
+    $$("#playersList button[data-player]").forEach(b => b.onclick = () => removePlayer(b.dataset.player));
+  }
   $$("#resultsList button[data-move]").forEach(b => b.onclick = () => moveRace(b.dataset.id, Number(b.dataset.move)));
 }
 function renderAll(){ renderHeader(); renderTicker(); if (state.me) { renderPicks(); renderBoard(); renderResults(); } }
@@ -636,6 +651,15 @@ async function addRace(){
   try { await store.saveRaces(RACES); racesSeeded = true; } catch(e){ console.error(e); RACES = RACES.filter(x=>x.id!==id); return toast(`Couldn't save race: ${e.message||e.code||"check the races table"}`); }
   ["#rTitle","#rC1","#rC2","#rNote"].forEach(s=>$(s).value=""); $("#rMargin").checked=true; $("#rPts").value=1;
   renderAll(); toast(`Added: ${title}`);
+}
+async function removePlayer(name){
+  if (!state.admin) return;
+  if (!confirm(`Remove ${name} and all their picks?`)) return;
+  state.all.picks = state.all.picks.filter(p=>p.name!==name);
+  if (state.me?.name === name) { state.me = null; state.myPicks = {}; state.myMargins = {}; localStorage.removeItem("en_me"); localStorage.removeItem("en_mypicks"); localStorage.removeItem("en_mymargins"); }
+  renderAll();
+  try { await store.deletePlayer(name); toast(`Removed ${name}.`); } catch(e){ console.error(e); toast(`Couldn't remove: ${e.message||e.code}`); }
+  if (!state.me) { renderOnboard(); showView("onboard"); }
 }
 async function moveRace(id, dir){
   const i = RACES.findIndex(x=>x.id===id); const j = i + dir;
