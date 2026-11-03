@@ -470,11 +470,13 @@ function renderTicker(){
   $("#tickerTxt").textContent = items.join("   ///   ") + "   ///   ";
 }
 function renderOnboard(){
+  const tapped = $$("#conflictChips .chip.sel").map(c=>c.dataset.r);
   const me = state.me || { name:"", avatar:"W", conflicts:[] };
+  if (tapped.length) me.conflicts = [...new Set([...me.conflicts, ...tapped])];
   $("#nameInput").value = me.name;
   $("#colorGrid").innerHTML = COLORS.map(c => `<button data-c="${c}" class="${c} ${c===me.avatar?'sel':''}" title="${c}"></button>`).join("");
   $$("#colorGrid button").forEach(b => b.onclick = () => { $$("#colorGrid button").forEach(x=>x.classList.remove("sel")); b.classList.add("sel"); });
-  $("#conflictChips").innerHTML = RACES.filter(r=>r.group!=="Big picture").map(r => `<button class="chip ${me.conflicts.includes(r.id)?'sel':''}" data-r="${r.id}">${esc(short(r.title))}</button>`).join("");
+  $("#conflictChips").innerHTML = RACES.map(r => `<button class="chip ${me.conflicts.includes(r.id)?'sel':''}" data-r="${r.id}">${esc(short(r.title))}</button>`).join("");
   $$("#conflictChips .chip").forEach(c => c.onclick = () => c.classList.toggle("sel"));
 }
 function stepper(raceId, val, disabled, cls="", max=99){
@@ -677,6 +679,7 @@ async function refresh(){
     }
     state.all = data; state.prevResults = { ...data.results }; state.lastCalledCount = calledNow;
     renderAll();
+    if ($("#view-onboard").classList.contains("active") && $("#conflictChips").children.length !== RACES.length) { const nm = $("#nameInput").value; renderOnboard(); $("#nameInput").value = nm; }
   } catch(e){ console.error(e); $("#syncTxt").textContent="offline"; $("#syncPill").className="pill locked"; }
 }
 
